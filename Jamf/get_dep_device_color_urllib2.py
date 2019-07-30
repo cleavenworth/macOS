@@ -3,7 +3,8 @@
 """
 Fetches a device's color from the Jamf uAPI's DEP endpoint (this data is only
 accessible there) and saves it to a local log to be read by an Extension Attribute.
-This version uses no standard libs only and is compatible with macOS' built-in Python.
+The extension attribute itself can be a script that calls this policy with a custom event trigger.
+This version uses standard libs only and is compatible with macOS' built-in Python.
 """
 
 import urllib2
@@ -32,14 +33,17 @@ def io_key(keyname):
 def get_hardware_serial():
     return io_key("IOPlatformSerialNumber".encode("utf-8"))
 
-#### Admin login credential values, supplied via Jamf Paramter Values
+#### Jamf API credentials, supplied via Paramter values within the policy.
+#### Jamf's own https://github.com/jamf/Encrypted-Script-Parameters is recommended
+#### to ensure the API credentials remain secure, as is creating a unique JSS user
+#### with permissions only to read DEP data.
 username = sys.argv[4]
 password = sys.argv[5]
+JamfUrl = sys.argv[6]
+DeviceEnrollmentInstanceId = sys.argv[7]
 DeviceSerial = get_hardware_serial()
 
-#### JSS Info
-JamfUrl = ""
-DeviceEnrollmentInstanceId = ""
+#### Jamf API Info DO NOT CHANGE BELOW THIS LINE
 GetTokenEndpoint = JamfUrl + "/uapi/auth/tokens"
 InvalidateTokenEndpoint = JamfUrl + "/uapi/auth/invalidateToken"
 DeviceEnrollmentEndpoint = JamfUrl + \
